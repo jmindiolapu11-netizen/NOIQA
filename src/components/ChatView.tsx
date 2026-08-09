@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import type { TeacherProfile } from "@/lib/constants";
 import { getSuggestedChips } from "@/lib/chat-helpers";
 import { Wordmark } from "./Wordmark";
+import { EmailCapture } from "./EmailCapture";
 
 type Message = {
   role: "user" | "assistant";
@@ -23,6 +24,7 @@ export function ChatView({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [skillBadge, setSkillBadge] = useState(false);
+  const [showEmailCapture, setShowEmailCapture] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -36,7 +38,12 @@ export function ChatView({
     if (messages.length === 2 && !skillBadge) {
       setSkillBadge(true);
     }
-  }, [messages.length, skillBadge]);
+    const alreadySubscribed = localStorage.getItem("noiqa-subscribed");
+    const dismissed = localStorage.getItem("noiqa-email-dismissed");
+    if (messages.length >= 2 && !alreadySubscribed && !dismissed && !showEmailCapture) {
+      setShowEmailCapture(true);
+    }
+  }, [messages.length, skillBadge, showEmailCapture]);
 
   async function sendMessage(text: string) {
     const trimmed = text.trim();
@@ -149,6 +156,15 @@ export function ChatView({
           <div ref={messagesEndRef} />
         </div>
       </div>
+
+      {showEmailCapture && (
+        <EmailCapture
+          onDismiss={() => {
+            setShowEmailCapture(false);
+            localStorage.setItem("noiqa-email-dismissed", "true");
+          }}
+        />
+      )}
 
       <div className="border-t border-carbon/5 bg-white/80 backdrop-blur-sm p-4">
         <div className="max-w-2xl mx-auto flex gap-2">
