@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = buildSystemPrompt(profile);
 
     const response = await anthropic.messages.create({
-      model: process.env.CLAUDE_MODEL || "claude-sonnet-4-20250514",
+      model: process.env.CLAUDE_MODEL || "claude-sonnet-5",
       max_tokens: 2048,
       system: systemPrompt,
       messages: messages.map((m) => ({
