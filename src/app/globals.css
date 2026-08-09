@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-lino: #F5F2EB;
+  --color-carbon: #1E252B;
+  --color-amber: #D97724;
+  --color-copper: #E08953;
+  --color-wine: #5C1D24;
+  --color-lino-dark: #E8E4DB;
+  --font-sans: var(--font-plus-jakarta);
+}
+
+body {
+  background: var(--color-lino);
+  color: var(--color-carbon);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.chat-message p { margin-bottom: 0.75rem; }
+.chat-message p:last-child { margin-bottom: 0; }
+.chat-message ul, .chat-message ol { margin: 0.5rem 0 0.75rem 1.25rem; }
+.chat-message li { margin-bottom: 0.25rem; }
+.chat-message strong { font-weight: 600; color: var(--color-carbon); }
+.chat-message h3 { font-weight: 700; font-size: 0.95rem; margin: 1rem 0 0.4rem; }
+
+.typing-dot {
+  animation: typing 1.4s infinite ease-in-out;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
