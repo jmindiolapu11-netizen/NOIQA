@@ -20,14 +20,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Correo inválido" }, { status: 400 });
   }
 
-  const subscribers = await getSubscribers();
+  const normalized = email.toLowerCase().trim();
+  console.log(`[subscribe] ${normalized}`);
 
-  if (subscribers.includes(email.toLowerCase())) {
-    return NextResponse.json({ already: true });
+  try {
+    const subscribers = await getSubscribers();
+    if (subscribers.includes(normalized)) {
+      return NextResponse.json({ already: true });
+    }
+    subscribers.push(normalized);
+    await fs.writeFile(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
+  } catch {
+    // Filesystem write fails on serverless (Vercel) — email is still logged above
   }
-
-  subscribers.push(email.toLowerCase());
-  await fs.writeFile(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
 
   return NextResponse.json({ ok: true });
 }
