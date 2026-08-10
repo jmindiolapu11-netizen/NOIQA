@@ -40,7 +40,8 @@ export function ChatView({
     }
     const alreadySubscribed = localStorage.getItem("noiqa-subscribed");
     const dismissed = localStorage.getItem("noiqa-email-dismissed");
-    if (messages.length >= 2 && !alreadySubscribed && !dismissed && !showEmailCapture) {
+    const assistantCount = messages.filter((m) => m.role === "assistant").length;
+    if (assistantCount >= 3 && !alreadySubscribed && !dismissed && !showEmailCapture) {
       setShowEmailCapture(true);
     }
   }, [messages.length, skillBadge, showEmailCapture]);
