@@ -91,7 +91,7 @@ export function ChatView({
   return (
     <div className="flex flex-col h-screen bg-lino">
       <header className="flex items-center justify-between px-4 py-3 border-b border-carbon/5 bg-white/80 backdrop-blur-sm">
-        <Wordmark size="sm" />
+        <Wordmark size="sm" showIcon />
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenSkills}

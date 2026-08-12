@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { SplashScreen } from "@/components/SplashScreen";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { ChatView } from "@/components/ChatView";
 import { SkillTree } from "@/components/SkillTree";
 import { isValidProfile, type TeacherProfile } from "@/lib/constants";
 
-type View = "loading" | "onboarding" | "chat" | "skills";
+type View = "loading" | "splash" | "onboarding" | "chat" | "skills";
 
 export default function Home() {
   const [view, setView] = useState<View>("loading");
@@ -23,7 +24,7 @@ export default function Home() {
       }
       localStorage.removeItem("noiqa-profile");
     }
-    setView("onboarding");
+    setView("splash");
   }, []);
 
   function handleOnboardingComplete(p: TeacherProfile) {
@@ -35,7 +36,7 @@ export default function Home() {
     localStorage.removeItem("noiqa-profile");
     localStorage.removeItem("noiqa-skills");
     setProfile(null);
-    setView("onboarding");
+    setView("splash");
   }
 
   if (view === "loading") {
@@ -44,6 +45,10 @@ export default function Home() {
         <div className="text-carbon/30 text-sm">Cargando...</div>
       </div>
     );
+  }
+
+  if (view === "splash") {
+    return <SplashScreen onStart={() => setView("onboarding")} />;
   }
 
   if (view === "onboarding") {

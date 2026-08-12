@@ -26,7 +26,7 @@ export function SkillTree({ onBack }: { onBack: () => void }) {
   return (
     <div className="min-h-screen bg-lino">
       <header className="flex items-center justify-between px-4 py-3 border-b border-carbon/5 bg-white/80 backdrop-blur-sm">
-        <Wordmark size="sm" />
+        <Wordmark size="sm" showIcon />
         <button
           onClick={onBack}
           className="px-3 py-1.5 text-xs font-medium rounded-lg text-carbon/60 hover:text-carbon hover:bg-carbon/5 transition-colors"
