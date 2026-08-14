@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Wordmark } from "./Wordmark";
 
 export function SplashScreen({ onStart }: { onStart: () => void }) {
-  const [play] = useState(true);
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFading(true);
+      setTimeout(onStart, 400);
+    }, 1900);
+    return () => clearTimeout(timer);
+  }, [onStart]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-lino px-5">
+    <div
+      className={`min-h-screen flex items-center justify-center bg-lino px-5 transition-all duration-400 ease-out ${
+        fading ? "opacity-0 scale-[0.97]" : ""
+      }`}
+    >
       <div className="flex flex-col items-center justify-center">
-        <div className={`splash-logo-wrap ${play ? "play" : ""}`}>
+        <div className="splash-logo-wrap play">
           <img
             src="/logo.png"
             alt="NOIQA"
@@ -19,16 +31,9 @@ export function SplashScreen({ onStart }: { onStart: () => void }) {
           />
         </div>
 
-        <div className={`splash-wordmark ${play ? "play" : ""}`}>
+        <div className="splash-wordmark play">
           <Wordmark size="lg" />
         </div>
-
-        <button
-          onClick={onStart}
-          className={`splash-cta ${play ? "play" : ""}`}
-        >
-          Comenzar
-        </button>
       </div>
     </div>
   );

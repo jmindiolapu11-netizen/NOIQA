@@ -142,15 +142,41 @@ export function ChatView({
           )}
           {isLoading && (
             <div className="mb-4 animate-fade-in">
-              <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-full bg-amber/15 flex items-center justify-center flex-shrink-0">
-                  <span className="text-amber text-xs font-bold">N</span>
-                </div>
-                <div className="flex gap-1 py-3">
-                  <span className="typing-dot w-2 h-2 rounded-full bg-amber/60" />
-                  <span className="typing-dot w-2 h-2 rounded-full bg-amber/60" />
-                  <span className="typing-dot w-2 h-2 rounded-full bg-amber/60" />
-                </div>
+              <div className="flex flex-col items-center gap-2 py-3">
+                <svg className="w-10 h-10 overflow-visible" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="loader-amber-copper" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#D97724" />
+                      <stop offset="100%" stopColor="#E08953" />
+                    </linearGradient>
+                    <linearGradient id="loader-burgundy" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#5C1D24" />
+                      <stop offset="100%" stopColor="#4A101D" />
+                    </linearGradient>
+                  </defs>
+                  <g className="noiqa-loader-group">
+                    <path
+                      d="M100 20 C125 20 140 40 140 70 L140 130 C140 160 125 180 100 180 C75 180 60 160 60 130 L60 70 C60 40 75 20 100 20 Z"
+                      fill="none"
+                      stroke="#1E252B"
+                      strokeWidth="18"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M20 100 C20 75 40 60 70 60 L130 60 C160 60 180 75 180 100 C180 125 160 140 130 140 L70 140 C40 140 20 125 20 100 Z"
+                      fill="none"
+                      stroke="url(#loader-amber-copper)"
+                      strokeWidth="18"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      className="noiqa-loader-core"
+                      d="M82 82 C90 74 110 74 118 82 C126 90 126 110 118 118 C110 126 90 126 82 118 C74 110 74 90 82 82 Z"
+                      fill="url(#loader-burgundy)"
+                    />
+                  </g>
+                </svg>
+                <span className="text-xs text-carbon/40">Pensando</span>
               </div>
             </div>
           )}

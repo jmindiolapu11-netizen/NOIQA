@@ -75,16 +75,24 @@ body {
   animation: splashFadeUp 0.5s ease-out 0.85s forwards;
 }
 
-.splash-cta {
-  margin-top: 36px; opacity: 0;
-  background: #5C1D24; color: #F5F2EB; border: none;
-  font-family: inherit; font-weight: 600; font-size: 14px;
-  padding: 13px 36px; border-radius: 12px;
-  cursor: pointer; transition: background 0.2s;
+/* NOIQA branded loader */
+.noiqa-loader-group {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: noiqa-spin 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
-.splash-cta:hover { background: #4a1720; }
-.splash-cta.play {
-  animation: splashFadeUp 0.5s ease-out 1.15s forwards;
+.noiqa-loader-core {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: noiqa-pulse 1.8s ease-in-out infinite alternate;
+}
+@keyframes noiqa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes noiqa-pulse {
+  0% { opacity: 0.5; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1.08); }
 }
 
 @keyframes splashFadeUp {
