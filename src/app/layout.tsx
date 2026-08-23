@@ -23,7 +23,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${plusJakarta.variable} h-full antialiased`}>
+    <html lang="es" className={`${plusJakarta.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          try {
+            if (localStorage.getItem('noiqa-theme') === 'dark') {
+              document.documentElement.classList.add('dark');
+            }
+          } catch(e) {}
+        `}} />
+      </head>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );

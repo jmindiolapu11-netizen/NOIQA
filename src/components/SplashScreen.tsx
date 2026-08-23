@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Wordmark } from "./Wordmark";
 
-export function SplashScreen({ onStart }: { onStart: () => void }) {
+export function SplashScreen({ onStart, dark = false }: { onStart: () => void; dark?: boolean }) {
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
@@ -16,9 +16,9 @@ export function SplashScreen({ onStart }: { onStart: () => void }) {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center bg-lino px-5 transition-all duration-400 ease-out ${
-        fading ? "opacity-0 scale-[0.97]" : ""
-      }`}
+      className={`min-h-screen flex items-center justify-center px-5 transition-all duration-400 ease-out ${
+        dark ? "bg-dark-bg" : "bg-lino"
+      } ${fading ? "opacity-0 scale-[0.97]" : ""}`}
     >
       <div className="flex flex-col items-center justify-center">
         <div className="splash-logo-wrap play">
@@ -32,7 +32,7 @@ export function SplashScreen({ onStart }: { onStart: () => void }) {
         </div>
 
         <div className="splash-wordmark play">
-          <Wordmark size="lg" />
+          <Wordmark size="lg" dark={dark} />
         </div>
       </div>
     </div>

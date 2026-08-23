@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SplashScreen } from "@/components/SplashScreen";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { ChatView } from "@/components/ChatView";
@@ -12,8 +12,15 @@ type View = "loading" | "splash" | "onboarding" | "chat" | "skills";
 export default function Home() {
   const [view, setView] = useState<View>("loading");
   const [profile, setProfile] = useState<TeacherProfile | null>(null);
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem("noiqa-theme");
+    if (savedTheme === "dark") {
+      setDark(true);
+      document.documentElement.classList.add("dark");
+    }
+
     const saved = localStorage.getItem("noiqa-profile");
     if (saved) {
       const parsed = JSON.parse(saved) as TeacherProfile;
@@ -25,6 +32,20 @@ export default function Home() {
       localStorage.removeItem("noiqa-profile");
     }
     setView("splash");
+  }, []);
+
+  const toggleDark = useCallback(() => {
+    setDark((prev) => {
+      const next = !prev;
+      if (next) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("noiqa-theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("noiqa-theme", "light");
+      }
+      return next;
+    });
   }, []);
 
   function handleOnboardingComplete(p: TeacherProfile) {
@@ -41,22 +62,22 @@ export default function Home() {
 
   if (view === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-lino">
-        <div className="text-carbon/30 text-sm">Cargando...</div>
+      <div className="min-h-screen flex items-center justify-center bg-lino dark:bg-dark-bg">
+        <div className="text-carbon/30 dark:text-white/30 text-sm">Cargando...</div>
       </div>
     );
   }
 
   if (view === "splash") {
-    return <SplashScreen onStart={() => setView("onboarding")} />;
+    return <SplashScreen onStart={() => setView("onboarding")} dark={dark} />;
   }
 
   if (view === "onboarding") {
-    return <OnboardingWizard onComplete={handleOnboardingComplete} />;
+    return <OnboardingWizard onComplete={handleOnboardingComplete} dark={dark} />;
   }
 
   if (view === "skills") {
-    return <SkillTree onBack={() => setView("chat")} />;
+    return <SkillTree onBack={() => setView("chat")} dark={dark} toggleDark={toggleDark} />;
   }
 
   return (
@@ -64,6 +85,8 @@ export default function Home() {
       profile={profile!}
       onOpenSkills={() => setView("skills")}
       onLogout={handleLogout}
+      dark={dark}
+      toggleDark={toggleDark}
     />
   );
 }
