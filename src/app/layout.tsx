@@ -27,10 +27,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: `
           try {
-            if (localStorage.getItem('noiqa-theme') === 'dark') {
+            var t = localStorage.getItem('noiqa-theme');
+            if (t !== 'light') {
               document.documentElement.classList.add('dark');
             }
-          } catch(e) {}
+          } catch(e) {
+            document.documentElement.classList.add('dark');
+          }
         `}} />
       </head>
       <body className="min-h-full flex flex-col font-sans">{children}</body>

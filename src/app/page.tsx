@@ -12,12 +12,14 @@ type View = "loading" | "splash" | "onboarding" | "chat" | "skills";
 export default function Home() {
   const [view, setView] = useState<View>("loading");
   const [profile, setProfile] = useState<TeacherProfile | null>(null);
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("noiqa-theme");
-    if (savedTheme === "dark") {
-      setDark(true);
+    if (savedTheme === "light") {
+      setDark(false);
+      document.documentElement.classList.remove("dark");
+    } else {
       document.documentElement.classList.add("dark");
     }
 
@@ -62,8 +64,8 @@ export default function Home() {
 
   if (view === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-lino dark:bg-dark-bg">
-        <div className="text-carbon/30 dark:text-white/30 text-sm">Cargando...</div>
+      <div className="min-h-screen flex items-center justify-center bg-dark-bg">
+        <div className="text-white/30 text-sm">Cargando...</div>
       </div>
     );
   }
