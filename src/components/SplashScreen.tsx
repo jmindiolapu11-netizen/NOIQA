@@ -26,8 +26,8 @@ export function SplashScreen({ onStart, dark = false }: { onStart: () => void; d
             src="/logo.png"
             alt="NOIQA"
             className="splash-logo-img"
-            width={130}
-            height={130}
+            width={160}
+            height={160}
           />
         </div>
 
