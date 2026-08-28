@@ -55,8 +55,6 @@ body.dark {
   width: 100%; display: block;
   clip-path: polygon(0 115%, 15% 115%, 0% 100%, 0% 100%);
   opacity: 0;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
 }
 .splash-logo-wrap.play .splash-logo-img {
   animation: wipeReveal 1s cubic-bezier(.65,0,.35,1) forwards;
