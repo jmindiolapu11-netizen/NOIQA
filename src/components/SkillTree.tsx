@@ -48,7 +48,7 @@ export function SkillTree({ onBack, dark, toggleDark }: { onBack: () => void; da
           <div className="flex items-center gap-3">
             <div className={`flex-1 h-2 rounded-full overflow-hidden ${dark ? "bg-white/5" : "bg-carbon/5"}`}>
               <div
-                className="h-full bg-wine-light rounded-full transition-all duration-500"
+                className={`h-full rounded-full transition-all duration-500 ${dark ? "bg-white" : "bg-carbon"}`}
                 style={{ width: `${(completedCount / SKILLS.length) * 100}%` }}
               />
             </div>
@@ -68,8 +68,8 @@ export function SkillTree({ onBack, dark, toggleDark }: { onBack: () => void; da
                 key={skill.id}
                 className={`rounded-xl border transition-all animate-slide-up ${
                   dark
-                    ? isCompleted ? "bg-dark-card border-wine-light/20" : "bg-dark-card border-white/5"
-                    : isCompleted ? "bg-white border-wine-light/20" : "bg-white border-carbon/5"
+                    ? isCompleted ? "bg-dark-card border-white/20" : "bg-dark-card border-white/5"
+                    : isCompleted ? "bg-white border-carbon/20" : "bg-white border-carbon/5"
                 }`}
                 style={{ animationDelay: `${index * 60}ms` }}
               >
@@ -80,7 +80,7 @@ export function SkillTree({ onBack, dark, toggleDark }: { onBack: () => void; da
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors ${
                       isCompleted
-                        ? "bg-wine-light text-white"
+                        ? dark ? "bg-white text-dark-bg" : "bg-carbon text-white"
                         : dark ? "bg-white/5 text-white/40" : "bg-carbon/5 text-carbon/40"
                     }`}
                   >
@@ -129,7 +129,7 @@ export function SkillTree({ onBack, dark, toggleDark }: { onBack: () => void; da
                         onClick={() => toggleComplete(skill.id)}
                         className={`text-xs font-medium px-4 py-2 rounded-lg transition-all ${
                           isCompleted
-                            ? "bg-wine-light/10 text-wine-light hover:bg-wine-light/15"
+                            ? dark ? "bg-white/10 text-white hover:bg-white/15" : "bg-carbon/10 text-carbon hover:bg-carbon/15"
                             : dark ? "bg-white/5 text-white/50 hover:bg-white/10" : "bg-carbon/5 text-carbon/50 hover:bg-carbon/10"
                         }`}
                       >

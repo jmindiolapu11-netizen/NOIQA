@@ -36,39 +36,29 @@ function ThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }
   );
 }
 
-function NoiqaLoader() {
+function NoiqaLoader({ dark }: { dark: boolean }) {
   return (
     <div className="flex flex-col items-center gap-2 py-3">
       <svg className="w-10 h-10 overflow-visible" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="loader-wine" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8B2E3A" />
-            <stop offset="100%" stopColor="#9E2F3F" />
-          </linearGradient>
-          <linearGradient id="loader-burgundy" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#5C1D24" />
-            <stop offset="100%" stopColor="#4A101D" />
-          </linearGradient>
-        </defs>
         <g className="noiqa-loader-group">
           <path
             d="M100 20 C125 20 140 40 140 70 L140 130 C140 160 125 180 100 180 C75 180 60 160 60 130 L60 70 C60 40 75 20 100 20 Z"
             fill="none"
-            stroke="#1E252B"
+            stroke={dark ? "rgba(255,255,255,0.3)" : "#1E252B"}
             strokeWidth="18"
             strokeLinecap="round"
           />
           <path
             d="M20 100 C20 75 40 60 70 60 L130 60 C160 60 180 75 180 100 C180 125 160 140 130 140 L70 140 C40 140 20 125 20 100 Z"
             fill="none"
-            stroke="url(#loader-wine)"
+            stroke={dark ? "rgba(255,255,255,0.6)" : "#4A4A4A"}
             strokeWidth="18"
             strokeLinecap="round"
           />
           <path
             className="noiqa-loader-core"
             d="M82 82 C90 74 110 74 118 82 C126 90 126 110 118 118 C110 126 90 126 82 118 C74 110 74 90 82 82 Z"
-            fill="url(#loader-burgundy)"
+            fill={dark ? "rgba(255,255,255,0.15)" : "rgba(30,37,43,0.15)"}
           />
         </g>
       </svg>
@@ -172,7 +162,9 @@ export function ChatView({
           >
             Habilidades
             {skillBadge && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-wine-light rounded-full border-2 border-white dark:border-dark-bg" />
+              <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 ${
+                dark ? "bg-white border-dark-bg" : "bg-carbon border-white"
+              }`} />
             )}
           </button>
           <button
@@ -206,7 +198,7 @@ export function ChatView({
                   <div className="max-w-[90%]">
                     <div className="flex items-start gap-3">
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        dark ? "bg-white/10" : "bg-wine-light/10"
+                        dark ? "bg-white/10" : "bg-carbon/10"
                       }`}>
                         <img src={dark ? "/logo-white.png" : "/logo.png"} alt="" className="w-4 h-4" />
                       </div>
@@ -223,7 +215,7 @@ export function ChatView({
           )}
           {isLoading && (
             <div className="mb-4 animate-fade-in">
-              <NoiqaLoader />
+              <NoiqaLoader dark={dark} />
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -251,16 +243,20 @@ export function ChatView({
             onKeyDown={handleKeyDown}
             placeholder="Escribe lo que necesitas..."
             rows={1}
-            className={`flex-1 px-4 py-3 rounded-xl border text-sm resize-none focus:outline-none focus:border-wine-light focus:ring-1 focus:ring-wine-light/30 ${
+            className={`flex-1 px-4 py-3 rounded-xl border text-sm resize-none focus:outline-none ${
               dark
-                ? "border-white/10 bg-dark-card text-white placeholder:text-white/30"
-                : "border-carbon/10 bg-lino/50 text-carbon"
+                ? "border-white/10 bg-dark-card text-white placeholder:text-white/30 focus:border-white/30 focus:ring-1 focus:ring-white/10"
+                : "border-carbon/10 bg-lino/50 text-carbon focus:border-carbon/30 focus:ring-1 focus:ring-carbon/10"
             }`}
           />
           <button
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || isLoading}
-            className="px-4 py-3 rounded-xl bg-wine-light text-white text-sm font-medium transition-all hover:bg-wine disabled:opacity-30 disabled:cursor-not-allowed"
+            className={`px-4 py-3 rounded-xl text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+              dark
+                ? "bg-white text-dark-bg hover:bg-white/90"
+                : "bg-carbon text-white hover:bg-carbon/90"
+            }`}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" />
@@ -283,7 +279,7 @@ function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fade-in">
       <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
-        dark ? "bg-white/10" : "bg-wine-light/10"
+        dark ? "bg-white/10" : "bg-carbon/10"
       }`}>
         <img src={dark ? "/logo-white.png" : "/logo.png"} alt="" className="w-7 h-7" />
       </div>
@@ -316,8 +312,8 @@ function FormattedMessage({ content, dark }: { content: string; dark: boolean })
               className={`mb-4 ${
                 isParaSalon
                   ? dark
-                    ? "bg-wine-light/10 border-l-2 border-wine-light/40 pl-3 py-2 rounded-r-lg"
-                    : "bg-wine-light/5 border-l-2 border-wine-light/30 pl-3 py-2 rounded-r-lg"
+                    ? "bg-white/[0.05] border-l-2 border-white/20 pl-3 py-2 rounded-r-lg"
+                    : "bg-carbon/[0.03] border-l-2 border-carbon/20 pl-3 py-2 rounded-r-lg"
                   : isComoSeLogro
                     ? dark
                       ? "bg-white/[0.03] border-l-2 border-white/10 pl-3 py-2 rounded-r-lg"
@@ -326,7 +322,6 @@ function FormattedMessage({ content, dark }: { content: string; dark: boolean })
               }`}
             >
               <h3 className={`font-semibold text-sm mb-1 ${dark ? "text-white" : "text-carbon"}`}>
-                {isParaSalon && <span className="text-wine-light mr-1">*</span>}
                 {title}
               </h3>
               <SimpleMarkdown text={body} dark={dark} />

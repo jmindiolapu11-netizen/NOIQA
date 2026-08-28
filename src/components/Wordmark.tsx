@@ -8,7 +8,7 @@ export function Wordmark({ size = "lg", showIcon = false, dark = false }: { size
       {showIcon && (
         <img src={dark ? "/logo-white.png" : "/logo.png"} alt="" className={iconSize} />
       )}
-      NOIQA<span className="text-wine-light">.</span>
+      NOIQA<span className={dark ? "text-white/40" : "text-carbon/40"}>.</span>
     </span>
   );
 }

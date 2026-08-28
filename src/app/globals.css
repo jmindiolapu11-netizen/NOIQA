@@ -3,12 +3,10 @@
 @theme inline {
   --color-lino: #F5F2EB;
   --color-carbon: #1E252B;
-  --color-wine-light: #8B2E3A;
-  --color-wine: #5C1D24;
   --color-lino-dark: #E8E4DB;
   --color-dark-bg: #0A0A0A;
   --color-dark-card: #1a1a1a;
-  --font-sans: var(--font-plus-jakarta);
+  --font-sans: var(--font-inter);
 }
 
 body {

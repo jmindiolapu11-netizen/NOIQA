@@ -33,7 +33,7 @@ export function EmailCapture({ onDismiss, dark = false }: { onDismiss: () => voi
   if (state === "done") {
     return (
       <div className={`mx-4 mb-4 p-4 rounded-xl animate-fade-in ${
-        dark ? "bg-wine-light/10 border border-wine-light/20" : "bg-wine-light/5 border border-wine-light/20"
+        dark ? "bg-white/5 border border-white/10" : "bg-carbon/5 border border-carbon/10"
       }`}>
         <div className="flex items-start justify-between">
           <div>
@@ -77,14 +77,20 @@ export function EmailCapture({ onDismiss, dark = false }: { onDismiss: () => voi
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="tu@correo.com"
-          className={`flex-1 px-3 py-2 rounded-lg border text-sm focus:outline-none focus:border-wine-light focus:ring-1 focus:ring-wine-light/30 ${
-            dark ? "border-white/10 bg-dark-bg text-white placeholder:text-white/30" : "border-carbon/10 bg-lino/50 text-carbon"
+          className={`flex-1 px-3 py-2 rounded-lg border text-sm focus:outline-none ${
+            dark
+              ? "border-white/10 bg-dark-bg text-white placeholder:text-white/30 focus:border-white/30 focus:ring-1 focus:ring-white/10"
+              : "border-carbon/10 bg-lino/50 text-carbon focus:border-carbon/30 focus:ring-1 focus:ring-carbon/10"
           }`}
         />
         <button
           type="submit"
           disabled={!email.trim() || state === "loading"}
-          className="px-4 py-2 rounded-lg bg-wine-light text-white text-xs font-medium transition-all hover:bg-wine disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
+          className={`px-4 py-2 rounded-lg text-xs font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap ${
+            dark
+              ? "bg-white text-dark-bg hover:bg-white/90"
+              : "bg-carbon text-white hover:bg-carbon/90"
+          }`}
         >
           {state === "loading" ? "..." : "Avísame"}
         </button>

@@ -43,11 +43,11 @@ export function OnboardingWizard({ onComplete, dark = false }: { onComplete: (pr
   }
 
   const selectedClass = dark
-    ? "border-wine-light bg-wine-light/15 text-white font-medium"
-    : "border-wine-light bg-wine-light/10 text-carbon font-medium";
+    ? "border-white bg-white/10 text-white font-medium"
+    : "border-carbon bg-carbon/10 text-carbon font-medium";
   const unselectedClass = dark
-    ? "border-white/10 text-white/70 hover:border-wine-light/40 hover:bg-wine-light/5"
-    : "border-carbon/8 text-carbon/70 hover:border-wine-light/40 hover:bg-wine-light/5";
+    ? "border-white/10 text-white/70 hover:border-white/30 hover:bg-white/5"
+    : "border-carbon/8 text-carbon/70 hover:border-carbon/30 hover:bg-carbon/5";
 
   return (
     <div className={`min-h-screen flex items-center justify-center px-4 ${dark ? "bg-dark-bg" : "bg-lino"}`}>
@@ -62,7 +62,7 @@ export function OnboardingWizard({ onComplete, dark = false }: { onComplete: (pr
             <div
               key={s}
               className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                s <= step ? "bg-wine-light" : dark ? "bg-white/10" : "bg-carbon/10"
+                s <= step ? (dark ? "bg-white" : "bg-carbon") : dark ? "bg-white/10" : "bg-carbon/10"
               }`}
             />
           ))}
@@ -98,7 +98,11 @@ export function OnboardingWizard({ onComplete, dark = false }: { onComplete: (pr
             <button
               onClick={next}
               disabled={!canProceed[step]}
-              className="px-6 py-2.5 rounded-lg text-sm font-medium bg-wine-light text-white transition-all hover:bg-wine disabled:opacity-30 disabled:cursor-not-allowed"
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                dark
+                  ? "bg-white text-dark-bg hover:bg-white/90"
+                  : "bg-carbon text-white hover:bg-carbon/90"
+              }`}
             >
               {step === 4 ? "Empezar" : "Siguiente"}
             </button>
@@ -161,8 +165,10 @@ function StepSubject({
           onChange={(e) => onCustomSubject(e.target.value)}
           placeholder="Escribe tu materia"
           autoFocus
-          className={`mt-3 w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-wine-light focus:ring-1 focus:ring-wine-light/30 ${
-            dark ? "border-white/10 bg-dark-bg text-white placeholder:text-white/30" : "border-carbon/15 bg-lino/50 text-carbon"
+          className={`mt-3 w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none ${
+            dark
+              ? "border-white/10 bg-dark-bg text-white placeholder:text-white/30 focus:border-white/30 focus:ring-1 focus:ring-white/10"
+              : "border-carbon/15 bg-lino/50 text-carbon focus:border-carbon/30 focus:ring-1 focus:ring-carbon/10"
           }`}
         />
       )}
