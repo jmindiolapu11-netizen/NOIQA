@@ -23,7 +23,7 @@ export function SplashScreen({ onStart, dark = false }: { onStart: () => void; d
       <div className="flex flex-col items-center justify-center">
         <div className="splash-logo-wrap play">
           <img
-            src="/logo.png"
+            src={dark ? "/logo-white.png" : "/logo.png"}
             alt="NOIQA"
             className="splash-logo-img"
             width={160}

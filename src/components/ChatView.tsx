@@ -206,9 +206,9 @@ export function ChatView({
                   <div className="max-w-[90%]">
                     <div className="flex items-start gap-3">
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        dark ? "bg-wine-light/20" : "bg-wine-light/10"
+                        dark ? "bg-white/10" : "bg-wine-light/10"
                       }`}>
-                        <img src="/logo.png" alt="" className="w-4 h-4" />
+                        <img src={dark ? "/logo-white.png" : "/logo.png"} alt="" className="w-4 h-4" />
                       </div>
                       <div className={`chat-message text-sm leading-relaxed flex-1 min-w-0 ${
                         dark ? "text-white/85" : "text-carbon/85"
@@ -283,9 +283,9 @@ function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fade-in">
       <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
-        dark ? "bg-wine-light/20" : "bg-wine-light/10"
+        dark ? "bg-white/10" : "bg-wine-light/10"
       }`}>
-        <img src="/logo.png" alt="" className="w-7 h-7" />
+        <img src={dark ? "/logo-white.png" : "/logo.png"} alt="" className="w-7 h-7" />
       </div>
       <h2 className={`text-xl font-semibold mb-1 ${dark ? "text-white" : "text-carbon"}`}>
         ¿Qué necesitas hoy?

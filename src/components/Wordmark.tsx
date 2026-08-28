@@ -6,7 +6,7 @@ export function Wordmark({ size = "lg", showIcon = false, dark = false }: { size
   return (
     <span className={`flex items-center gap-2 ${textClass} font-bold tracking-tight ${dark ? "text-white" : "text-carbon"}`}>
       {showIcon && (
-        <img src="/logo.png" alt="" className={iconSize} />
+        <img src={dark ? "/logo-white.png" : "/logo.png"} alt="" className={iconSize} />
       )}
       NOIQA<span className="text-wine-light">.</span>
     </span>
