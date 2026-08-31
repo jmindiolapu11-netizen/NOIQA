@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { SplashScreen } from "@/components/SplashScreen";
-import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { ChatView } from "@/components/ChatView";
 import { SkillTree } from "@/components/SkillTree";
 import { isValidProfile, type TeacherProfile } from "@/lib/constants";
 
-type View = "loading" | "splash" | "onboarding" | "chat" | "skills";
+type View = "loading" | "splash" | "chat" | "skills";
 
 export default function Home() {
   const [view, setView] = useState<View>("loading");
@@ -50,14 +49,10 @@ export default function Home() {
     });
   }, []);
 
-  function handleOnboardingComplete(p: TeacherProfile) {
-    setProfile(p);
-    setView("chat");
-  }
-
   function handleLogout() {
     localStorage.removeItem("noiqa-profile");
     localStorage.removeItem("noiqa-skills");
+    localStorage.removeItem("noiqa-email");
     setProfile(null);
     setView("splash");
   }
@@ -71,11 +66,7 @@ export default function Home() {
   }
 
   if (view === "splash") {
-    return <SplashScreen onStart={() => setView("onboarding")} dark={dark} />;
-  }
-
-  if (view === "onboarding") {
-    return <OnboardingWizard onComplete={handleOnboardingComplete} dark={dark} />;
+    return <SplashScreen onStart={() => setView("chat")} dark={dark} />;
   }
 
   if (view === "skills") {
@@ -84,9 +75,10 @@ export default function Home() {
 
   return (
     <ChatView
-      profile={profile!}
+      profile={profile}
       onOpenSkills={() => setView("skills")}
       onLogout={handleLogout}
+      onProfileUpdate={(p) => setProfile(p)}
       dark={dark}
       toggleDark={toggleDark}
     />

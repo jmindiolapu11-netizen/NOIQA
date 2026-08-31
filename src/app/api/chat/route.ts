@@ -12,16 +12,18 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { messages, profile } = body as {
     messages: Array<{ role: "user" | "assistant"; content: string }>;
-    profile: TeacherProfile;
+    profile: TeacherProfile | null;
   };
 
-  if (!messages?.length || !isValidProfile(profile)) {
+  if (!messages?.length) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   try {
     const anthropic = new Anthropic({ apiKey });
-    const systemPrompt = buildSystemPrompt(profile);
+    const systemPrompt = isValidProfile(profile)
+      ? buildSystemPrompt(profile)
+      : buildSystemPrompt({ subject: "General", level: "Secundaria", task: "Preparar mi clase (planeación y materiales)", comfort: "some" });
 
     const response = await anthropic.messages.create({
       model: process.env.CLAUDE_MODEL || "claude-sonnet-5",

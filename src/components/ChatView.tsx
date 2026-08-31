@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import type { TeacherProfile } from "@/lib/constants";
 import { Wordmark } from "./Wordmark";
-import { EmailCapture } from "./EmailCapture";
+import { RegisterModal } from "./RegisterModal";
 
 type Message = {
   role: "user" | "assistant";
@@ -71,12 +71,14 @@ export function ChatView({
   profile,
   onOpenSkills,
   onLogout,
+  onProfileUpdate,
   dark,
   toggleDark,
 }: {
-  profile: TeacherProfile;
+  profile: TeacherProfile | null;
   onOpenSkills: () => void;
   onLogout: () => void;
+  onProfileUpdate: (profile: TeacherProfile) => void;
   dark: boolean;
   toggleDark: () => void;
 }) {
@@ -84,7 +86,7 @@ export function ChatView({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [skillBadge, setSkillBadge] = useState(false);
-  const [showEmailCapture, setShowEmailCapture] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -96,13 +98,12 @@ export function ChatView({
     if (messages.length === 2 && !skillBadge) {
       setSkillBadge(true);
     }
-    const alreadySubscribed = localStorage.getItem("noiqa-subscribed");
-    const dismissed = localStorage.getItem("noiqa-email-dismissed");
     const assistantCount = messages.filter((m) => m.role === "assistant").length;
-    if (assistantCount >= 3 && !alreadySubscribed && !dismissed && !showEmailCapture) {
-      setShowEmailCapture(true);
+    if (assistantCount >= 1 && !profile && !showRegister) {
+      const timer = setTimeout(() => setShowRegister(true), 1500);
+      return () => clearTimeout(timer);
     }
-  }, [messages.length, skillBadge, showEmailCapture]);
+  }, [messages.length, skillBadge, showRegister, profile]);
 
   async function sendMessage(text: string) {
     const trimmed = text.trim();
@@ -222,12 +223,12 @@ export function ChatView({
         </div>
       </div>
 
-      {showEmailCapture && (
-        <EmailCapture
+      {showRegister && !profile && (
+        <RegisterModal
           dark={dark}
-          onDismiss={() => {
-            setShowEmailCapture(false);
-            localStorage.setItem("noiqa-email-dismissed", "true");
+          onComplete={(p) => {
+            setShowRegister(false);
+            onProfileUpdate(p);
           }}
         />
       )}
@@ -273,7 +274,7 @@ function EmptyState({
   profile,
   dark,
 }: {
-  profile: TeacherProfile;
+  profile: TeacherProfile | null;
   dark: boolean;
 }) {
   return (
@@ -287,7 +288,9 @@ function EmptyState({
         ¿Qué necesitas hoy?
       </h2>
       <p className={`text-sm mb-8 max-w-sm ${dark ? "text-white/50" : "text-carbon/50"}`}>
-        Soy tu copiloto para {profile.subject} en {profile.level.toLowerCase()}. Pregúntame lo que necesites.
+        {profile
+          ? `Soy tu copiloto para ${profile.subject} en ${profile.level.toLowerCase()}. Pregúntame lo que necesites.`
+          : "Soy tu copiloto de IA para enseñar. Pregúntame lo que necesites."}
       </p>
     </div>
   );
