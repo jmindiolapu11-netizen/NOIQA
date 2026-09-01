@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { TeacherProfile } from "@/lib/constants";
+import { getSuggestedChips } from "@/lib/chat-helpers";
 import { Wordmark } from "./Wordmark";
 import { RegisterModal } from "./RegisterModal";
 
@@ -182,7 +183,7 @@ export function ChatView({
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-2xl mx-auto">
           {messages.length === 0 ? (
-            <EmptyState profile={profile} dark={dark} />
+            <EmptyState profile={profile} dark={dark} onSend={sendMessage} />
           ) : (
             messages.map((msg, i) => (
               <div
@@ -270,13 +271,25 @@ export function ChatView({
   );
 }
 
+const GENERIC_SUGGESTIONS = [
+  "Planea una clase de 50 minutos para mi materia",
+  "Hazme un quiz de 10 preguntas para mis alumnos",
+  "Dame una dinámica grupal para el salón de clases",
+];
+
 function EmptyState({
   profile,
   dark,
+  onSend,
 }: {
   profile: TeacherProfile | null;
   dark: boolean;
+  onSend: (text: string) => void;
 }) {
+  const suggestions = profile
+    ? getSuggestedChips(profile).slice(0, 3)
+    : GENERIC_SUGGESTIONS;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fade-in">
       <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
@@ -287,11 +300,26 @@ function EmptyState({
       <h2 className={`text-xl font-semibold mb-1 ${dark ? "text-white" : "text-carbon"}`}>
         ¿Qué necesitas hoy?
       </h2>
-      <p className={`text-sm mb-8 max-w-sm ${dark ? "text-white/50" : "text-carbon/50"}`}>
+      <p className={`text-sm mb-6 max-w-sm ${dark ? "text-white/50" : "text-carbon/50"}`}>
         {profile
           ? `Soy tu copiloto para ${profile.subject} en ${profile.level.toLowerCase()}. Pregúntame lo que necesites.`
           : "Soy tu copiloto de IA para enseñar. Pregúntame lo que necesites."}
       </p>
+      <div className="w-full max-w-md space-y-1">
+        {suggestions.map((text, i) => (
+          <button
+            key={i}
+            onClick={() => onSend(text)}
+            className={`w-full text-left px-4 py-2.5 text-sm rounded-lg transition-colors ${
+              dark
+                ? "text-white/50 hover:text-white/80 hover:bg-white/5"
+                : "text-carbon/50 hover:text-carbon/80 hover:bg-carbon/5"
+            }`}
+          >
+            {text}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
