@@ -6,7 +6,7 @@ import { Wordmark } from "./Wordmark";
 
 type Step = 1 | 2 | 3 | 4;
 
-export function OnboardingWizard({ onComplete }: { onComplete: (profile: TeacherProfile) => void }) {
+export function OnboardingWizard({ onComplete, dark = false }: { onComplete: (profile: TeacherProfile) => void; dark?: boolean }) {
   const [step, setStep] = useState<Step>(1);
   const [subject, setSubject] = useState("");
   const [customSubject, setCustomSubject] = useState("");
@@ -42,12 +42,19 @@ export function OnboardingWizard({ onComplete }: { onComplete: (profile: Teacher
     if (step > 1) setStep((step - 1) as Step);
   }
 
+  const selectedClass = dark
+    ? "border-white bg-white/10 text-white font-medium"
+    : "border-carbon bg-carbon/10 text-carbon font-medium";
+  const unselectedClass = dark
+    ? "border-white/10 text-white/70 hover:border-white/30 hover:bg-white/5"
+    : "border-carbon/8 text-carbon/70 hover:border-carbon/30 hover:bg-carbon/5";
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-lino px-4">
+    <div className={`min-h-screen flex items-center justify-center px-4 ${dark ? "bg-dark-bg" : "bg-lino"}`}>
       <div className="w-full max-w-lg">
         <div className="text-center mb-10 animate-fade-in">
-          <Wordmark size="lg" />
-          <p className="mt-2 text-carbon/60 text-sm">Tu copiloto de IA para enseñar</p>
+          <Wordmark size="lg" dark={dark} />
+          <p className={`mt-2 text-sm ${dark ? "text-white/60" : "text-carbon/60"}`}>Tu copiloto de IA para enseñar</p>
         </div>
 
         <div className="flex gap-2 mb-8 px-4">
@@ -55,30 +62,35 @@ export function OnboardingWizard({ onComplete }: { onComplete: (profile: Teacher
             <div
               key={s}
               className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                s <= step ? "bg-amber" : "bg-carbon/10"
+                s <= step ? (dark ? "bg-white" : "bg-carbon") : dark ? "bg-white/10" : "bg-carbon/10"
               }`}
             />
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-carbon/5 p-6 animate-slide-up" key={step}>
+        <div className={`rounded-2xl shadow-sm border p-6 animate-slide-up ${
+          dark ? "bg-dark-card border-white/5" : "bg-white border-carbon/5"
+        }`} key={step}>
           {step === 1 && (
             <StepSubject
               subject={subject}
               customSubject={customSubject}
               onSubject={setSubject}
               onCustomSubject={setCustomSubject}
+              dark={dark}
+              selectedClass={selectedClass}
+              unselectedClass={unselectedClass}
             />
           )}
-          {step === 2 && <StepLevel level={level} onLevel={setLevel} />}
-          {step === 3 && level && <StepTask level={level as Level} task={task} onTask={setTask} />}
-          {step === 4 && <StepComfort comfort={comfort} onComfort={setComfort} />}
+          {step === 2 && <StepLevel level={level} onLevel={setLevel} dark={dark} selectedClass={selectedClass} unselectedClass={unselectedClass} />}
+          {step === 3 && level && <StepTask level={level as Level} task={task} onTask={setTask} dark={dark} selectedClass={selectedClass} unselectedClass={unselectedClass} />}
+          {step === 4 && <StepComfort comfort={comfort} onComfort={setComfort} dark={dark} selectedClass={selectedClass} unselectedClass={unselectedClass} />}
 
           <div className="flex justify-between mt-8">
             <button
               onClick={back}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                step === 1 ? "invisible" : "text-carbon/50 hover:text-carbon hover:bg-carbon/5"
+                step === 1 ? "invisible" : dark ? "text-white/50 hover:text-white hover:bg-white/5" : "text-carbon/50 hover:text-carbon hover:bg-carbon/5"
               }`}
             >
               Atrás
@@ -86,7 +98,11 @@ export function OnboardingWizard({ onComplete }: { onComplete: (profile: Teacher
             <button
               onClick={next}
               disabled={!canProceed[step]}
-              className="px-6 py-2.5 rounded-lg text-sm font-medium bg-wine text-white transition-all hover:bg-wine/90 disabled:opacity-30 disabled:cursor-not-allowed"
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                dark
+                  ? "bg-white text-dark-bg hover:bg-white/90"
+                  : "bg-carbon text-white hover:bg-carbon/90"
+              }`}
             >
               {step === 4 ? "Empezar" : "Siguiente"}
             </button>
@@ -97,30 +113,37 @@ export function OnboardingWizard({ onComplete }: { onComplete: (profile: Teacher
   );
 }
 
+type StepProps = {
+  dark: boolean;
+  selectedClass: string;
+  unselectedClass: string;
+};
+
 function StepSubject({
   subject,
   customSubject,
   onSubject,
   onCustomSubject,
+  dark,
+  selectedClass,
+  unselectedClass,
 }: {
   subject: string;
   customSubject: string;
   onSubject: (v: string) => void;
   onCustomSubject: (v: string) => void;
-}) {
+} & StepProps) {
   return (
     <>
-      <h2 className="text-lg font-semibold text-carbon mb-1">¿Qué materia enseñas?</h2>
-      <p className="text-sm text-carbon/50 mb-5">Selecciona la principal o escribe la tuya</p>
+      <h2 className={`text-lg font-semibold mb-1 ${dark ? "text-white" : "text-carbon"}`}>¿Qué materia enseñas?</h2>
+      <p className={`text-sm mb-5 ${dark ? "text-white/50" : "text-carbon/50"}`}>Selecciona la principal o escribe la tuya</p>
       <div className="grid grid-cols-2 gap-2">
         {SUBJECTS.map((s) => (
           <button
             key={s}
             onClick={() => onSubject(s)}
             className={`px-3 py-2.5 rounded-lg text-sm text-left transition-all border ${
-              subject === s
-                ? "border-amber bg-amber/10 text-carbon font-medium"
-                : "border-carbon/8 text-carbon/70 hover:border-amber/40 hover:bg-amber/5"
+              subject === s ? selectedClass : unselectedClass
             }`}
           >
             {s}
@@ -129,9 +152,7 @@ function StepSubject({
         <button
           onClick={() => onSubject("__custom")}
           className={`px-3 py-2.5 rounded-lg text-sm text-left transition-all border col-span-2 ${
-            subject === "__custom"
-              ? "border-amber bg-amber/10 text-carbon font-medium"
-              : "border-carbon/8 text-carbon/70 hover:border-amber/40 hover:bg-amber/5"
+            subject === "__custom" ? selectedClass : unselectedClass
           }`}
         >
           Otra materia...
@@ -144,27 +165,29 @@ function StepSubject({
           onChange={(e) => onCustomSubject(e.target.value)}
           placeholder="Escribe tu materia"
           autoFocus
-          className="mt-3 w-full px-4 py-2.5 rounded-lg border border-carbon/15 text-sm focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber/30 bg-lino/50"
+          className={`mt-3 w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none ${
+            dark
+              ? "border-white/10 bg-dark-bg text-white placeholder:text-white/30 focus:border-white/30 focus:ring-1 focus:ring-white/10"
+              : "border-carbon/15 bg-lino/50 text-carbon focus:border-carbon/30 focus:ring-1 focus:ring-carbon/10"
+          }`}
         />
       )}
     </>
   );
 }
 
-function StepLevel({ level, onLevel }: { level: string; onLevel: (v: Level) => void }) {
+function StepLevel({ level, onLevel, dark, selectedClass, unselectedClass }: { level: string; onLevel: (v: Level) => void } & StepProps) {
   return (
     <>
-      <h2 className="text-lg font-semibold text-carbon mb-1">¿En qué nivel educativo?</h2>
-      <p className="text-sm text-carbon/50 mb-5">Esto adapta las respuestas a tu contexto</p>
+      <h2 className={`text-lg font-semibold mb-1 ${dark ? "text-white" : "text-carbon"}`}>¿En qué nivel educativo?</h2>
+      <p className={`text-sm mb-5 ${dark ? "text-white/50" : "text-carbon/50"}`}>Esto adapta las respuestas a tu contexto</p>
       <div className="space-y-2">
         {LEVELS.map((l) => (
           <button
             key={l}
             onClick={() => onLevel(l)}
             className={`w-full px-4 py-3.5 rounded-lg text-left transition-all border ${
-              level === l
-                ? "border-amber bg-amber/10 text-carbon font-medium"
-                : "border-carbon/8 text-carbon/70 hover:border-amber/40 hover:bg-amber/5"
+              level === l ? selectedClass : unselectedClass
             }`}
           >
             {l}
@@ -175,12 +198,12 @@ function StepLevel({ level, onLevel }: { level: string; onLevel: (v: Level) => v
   );
 }
 
-function StepTask({ level, task, onTask }: { level: Level; task: string; onTask: (v: string) => void }) {
+function StepTask({ level, task, onTask, dark, selectedClass, unselectedClass }: { level: Level; task: string; onTask: (v: string) => void } & StepProps) {
   const tasks = getTaskOptions(level);
   return (
     <>
-      <h2 className="text-lg font-semibold text-carbon mb-1">¿Qué tarea repites más?</h2>
-      <p className="text-sm text-carbon/50 mb-5">
+      <h2 className={`text-lg font-semibold mb-1 ${dark ? "text-white" : "text-carbon"}`}>¿Qué tarea repites más?</h2>
+      <p className={`text-sm mb-5 ${dark ? "text-white/50" : "text-carbon/50"}`}>
         Empezaremos por aquí — después puedes explorar todo
       </p>
       <div className="space-y-2">
@@ -189,9 +212,7 @@ function StepTask({ level, task, onTask }: { level: Level; task: string; onTask:
             key={t}
             onClick={() => onTask(t)}
             className={`w-full px-4 py-3.5 rounded-lg text-sm text-left transition-all border ${
-              task === t
-                ? "border-amber bg-amber/10 text-carbon font-medium"
-                : "border-carbon/8 text-carbon/70 hover:border-amber/40 hover:bg-amber/5"
+              task === t ? selectedClass : unselectedClass
             }`}
           >
             {t}
@@ -202,24 +223,22 @@ function StepTask({ level, task, onTask }: { level: Level; task: string; onTask:
   );
 }
 
-function StepComfort({ comfort, onComfort }: { comfort: string; onComfort: (v: string) => void }) {
+function StepComfort({ comfort, onComfort, dark, selectedClass, unselectedClass }: { comfort: string; onComfort: (v: string) => void } & StepProps) {
   return (
     <>
-      <h2 className="text-lg font-semibold text-carbon mb-1">¿Qué tan cómodo te sientes con IA?</h2>
-      <p className="text-sm text-carbon/50 mb-5">No hay respuesta correcta — solo queremos adaptarnos</p>
+      <h2 className={`text-lg font-semibold mb-1 ${dark ? "text-white" : "text-carbon"}`}>¿Qué tan cómodo te sientes con IA?</h2>
+      <p className={`text-sm mb-5 ${dark ? "text-white/50" : "text-carbon/50"}`}>No hay respuesta correcta — solo queremos adaptarnos</p>
       <div className="space-y-2">
         {COMFORT_LEVELS.map((c) => (
           <button
             key={c.value}
             onClick={() => onComfort(c.value)}
             className={`w-full px-4 py-3.5 rounded-lg text-left transition-all border ${
-              comfort === c.value
-                ? "border-amber bg-amber/10 text-carbon font-medium"
-                : "border-carbon/8 text-carbon/70 hover:border-amber/40 hover:bg-amber/5"
+              comfort === c.value ? selectedClass : unselectedClass
             }`}
           >
             <span className="text-sm font-medium">{c.label}</span>
-            <span className="block text-xs text-carbon/50 mt-0.5">{c.description}</span>
+            <span className={`block text-xs mt-0.5 ${dark ? "text-white/50" : "text-carbon/50"}`}>{c.description}</span>
           </button>
         ))}
       </div>

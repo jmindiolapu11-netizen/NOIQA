@@ -4,31 +4,92 @@ import { useState, useRef, useEffect } from "react";
 import type { TeacherProfile } from "@/lib/constants";
 import { getSuggestedChips } from "@/lib/chat-helpers";
 import { Wordmark } from "./Wordmark";
-import { EmailCapture } from "./EmailCapture";
+import { RegisterModal } from "./RegisterModal";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
 };
 
+function ThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      className={`px-2 py-1.5 rounded-lg transition-colors ${
+        dark ? "text-white/60 hover:text-white hover:bg-white/10" : "text-carbon/60 hover:text-carbon hover:bg-carbon/5"
+      }`}
+      title={dark ? "Modo claro" : "Modo oscuro"}
+    >
+      {dark ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
+function NoiqaLoader({ dark }: { dark: boolean }) {
+  return (
+    <div className="flex flex-col items-center gap-2 py-3">
+      <svg className="w-10 h-10 overflow-visible" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <g className="noiqa-loader-group">
+          <path
+            d="M100 20 C125 20 140 40 140 70 L140 130 C140 160 125 180 100 180 C75 180 60 160 60 130 L60 70 C60 40 75 20 100 20 Z"
+            fill="none"
+            stroke={dark ? "rgba(255,255,255,0.3)" : "#1E252B"}
+            strokeWidth="18"
+            strokeLinecap="round"
+          />
+          <path
+            d="M20 100 C20 75 40 60 70 60 L130 60 C160 60 180 75 180 100 C180 125 160 140 130 140 L70 140 C40 140 20 125 20 100 Z"
+            fill="none"
+            stroke={dark ? "rgba(255,255,255,0.6)" : "#4A4A4A"}
+            strokeWidth="18"
+            strokeLinecap="round"
+          />
+          <path
+            className="noiqa-loader-core"
+            d="M82 82 C90 74 110 74 118 82 C126 90 126 110 118 118 C110 126 90 126 82 118 C74 110 74 90 82 82 Z"
+            fill={dark ? "rgba(255,255,255,0.15)" : "rgba(30,37,43,0.15)"}
+          />
+        </g>
+      </svg>
+      <span className="text-xs text-carbon/40 dark:text-white/40">Pensando</span>
+    </div>
+  );
+}
+
 export function ChatView({
   profile,
   onOpenSkills,
   onLogout,
+  onProfileUpdate,
+  dark,
+  toggleDark,
 }: {
-  profile: TeacherProfile;
+  profile: TeacherProfile | null;
   onOpenSkills: () => void;
   onLogout: () => void;
+  onProfileUpdate: (profile: TeacherProfile) => void;
+  dark: boolean;
+  toggleDark: () => void;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [skillBadge, setSkillBadge] = useState(false);
-  const [showEmailCapture, setShowEmailCapture] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  const chips = getSuggestedChips(profile);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,13 +99,12 @@ export function ChatView({
     if (messages.length === 2 && !skillBadge) {
       setSkillBadge(true);
     }
-    const alreadySubscribed = localStorage.getItem("noiqa-subscribed");
-    const dismissed = localStorage.getItem("noiqa-email-dismissed");
     const assistantCount = messages.filter((m) => m.role === "assistant").length;
-    if (assistantCount >= 3 && !alreadySubscribed && !dismissed && !showEmailCapture) {
-      setShowEmailCapture(true);
+    if (assistantCount >= 1 && !profile && !showRegister) {
+      const timer = setTimeout(() => setShowRegister(true), 1500);
+      return () => clearTimeout(timer);
     }
-  }, [messages.length, skillBadge, showEmailCapture]);
+  }, [messages.length, skillBadge, showRegister, profile]);
 
   async function sendMessage(text: string) {
     const trimmed = text.trim();
@@ -89,22 +149,31 @@ export function ChatView({
   }
 
   return (
-    <div className="flex flex-col h-screen bg-lino">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-carbon/5 bg-white/80 backdrop-blur-sm">
-        <Wordmark size="sm" showIcon />
-        <div className="flex items-center gap-2">
+    <div className={`flex flex-col h-screen ${dark ? "bg-dark-bg" : "bg-lino"}`}>
+      <header className={`flex items-center justify-between px-4 py-3 border-b ${
+        dark ? "border-white/5 bg-dark-bg" : "border-carbon/5 bg-white/80 backdrop-blur-sm"
+      }`}>
+        <Wordmark size="sm" showIcon dark={dark} />
+        <div className="flex items-center gap-1">
+          <ThemeToggle dark={dark} onToggle={toggleDark} />
           <button
             onClick={onOpenSkills}
-            className="relative px-3 py-1.5 text-xs font-medium rounded-lg transition-colors text-carbon/60 hover:text-carbon hover:bg-carbon/5"
+            className={`relative px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              dark ? "text-white/60 hover:text-white hover:bg-white/10" : "text-carbon/60 hover:text-carbon hover:bg-carbon/5"
+            }`}
           >
             Habilidades
             {skillBadge && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber rounded-full border-2 border-white" />
+              <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 ${
+                dark ? "bg-white border-dark-bg" : "bg-carbon border-white"
+              }`} />
             )}
           </button>
           <button
             onClick={onLogout}
-            className="px-3 py-1.5 text-xs font-medium rounded-lg text-carbon/40 hover:text-carbon/70 hover:bg-carbon/5 transition-colors"
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              dark ? "text-white/40 hover:text-white/70 hover:bg-white/10" : "text-carbon/40 hover:text-carbon/70 hover:bg-carbon/5"
+            }`}
           >
             Reiniciar
           </button>
@@ -114,7 +183,7 @@ export function ChatView({
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-2xl mx-auto">
           {messages.length === 0 ? (
-            <EmptyState chips={chips} onChip={sendMessage} profile={profile} />
+            <EmptyState profile={profile} dark={dark} onSend={sendMessage} />
           ) : (
             messages.map((msg, i) => (
               <div
@@ -122,17 +191,23 @@ export function ChatView({
                 className={`mb-4 animate-fade-in ${msg.role === "user" ? "flex justify-end" : ""}`}
               >
                 {msg.role === "user" ? (
-                  <div className="max-w-[80%] px-4 py-3 rounded-2xl rounded-br-sm bg-carbon text-white text-sm leading-relaxed">
+                  <div className={`max-w-[80%] px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed ${
+                    dark ? "bg-white/10 text-white" : "bg-carbon text-white"
+                  }`}>
                     {msg.content}
                   </div>
                 ) : (
                   <div className="max-w-[90%]">
                     <div className="flex items-start gap-3">
-                      <div className="w-7 h-7 rounded-full bg-amber/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-amber text-xs font-bold">N</span>
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                        dark ? "bg-white/10" : "bg-carbon/10"
+                      }`}>
+                        <img src={dark ? "/logo-white.png" : "/logo.png"} alt="" className="w-4 h-4" />
                       </div>
-                      <div className="chat-message text-sm leading-relaxed text-carbon/85 flex-1 min-w-0">
-                        <FormattedMessage content={msg.content} />
+                      <div className={`chat-message text-sm leading-relaxed flex-1 min-w-0 ${
+                        dark ? "text-white/85" : "text-carbon/85"
+                      }`}>
+                        <FormattedMessage content={msg.content} dark={dark} />
                       </div>
                     </div>
                   </div>
@@ -142,32 +217,26 @@ export function ChatView({
           )}
           {isLoading && (
             <div className="mb-4 animate-fade-in">
-              <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-full bg-amber/15 flex items-center justify-center flex-shrink-0">
-                  <span className="text-amber text-xs font-bold">N</span>
-                </div>
-                <div className="flex gap-1 py-3">
-                  <span className="typing-dot w-2 h-2 rounded-full bg-amber/60" />
-                  <span className="typing-dot w-2 h-2 rounded-full bg-amber/60" />
-                  <span className="typing-dot w-2 h-2 rounded-full bg-amber/60" />
-                </div>
-              </div>
+              <NoiqaLoader dark={dark} />
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {showEmailCapture && (
-        <EmailCapture
-          onDismiss={() => {
-            setShowEmailCapture(false);
-            localStorage.setItem("noiqa-email-dismissed", "true");
+      {showRegister && !profile && (
+        <RegisterModal
+          dark={dark}
+          onComplete={(p) => {
+            setShowRegister(false);
+            onProfileUpdate(p);
           }}
         />
       )}
 
-      <div className="border-t border-carbon/5 bg-white/80 backdrop-blur-sm p-4">
+      <div className={`border-t p-4 ${
+        dark ? "border-white/5 bg-dark-bg" : "border-carbon/5 bg-white/80 backdrop-blur-sm"
+      }`}>
         <div className="max-w-2xl mx-auto flex gap-2">
           <textarea
             ref={inputRef}
@@ -176,12 +245,20 @@ export function ChatView({
             onKeyDown={handleKeyDown}
             placeholder="Escribe lo que necesitas..."
             rows={1}
-            className="flex-1 px-4 py-3 rounded-xl border border-carbon/10 text-sm resize-none focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber/30 bg-lino/50"
+            className={`flex-1 px-4 py-3 rounded-xl border text-sm resize-none focus:outline-none ${
+              dark
+                ? "border-white/10 bg-dark-card text-white placeholder:text-white/30 focus:border-white/30 focus:ring-1 focus:ring-white/10"
+                : "border-carbon/10 bg-lino/50 text-carbon focus:border-carbon/30 focus:ring-1 focus:ring-carbon/10"
+            }`}
           />
           <button
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || isLoading}
-            className="px-4 py-3 rounded-xl bg-wine text-white text-sm font-medium transition-all hover:bg-wine/90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className={`px-4 py-3 rounded-xl text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+              dark
+                ? "bg-white text-dark-bg hover:bg-white/90"
+                : "bg-carbon text-white hover:bg-carbon/90"
+            }`}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" />
@@ -194,32 +271,52 @@ export function ChatView({
   );
 }
 
+const GENERIC_SUGGESTIONS = [
+  "Planea una clase de 50 minutos para mi materia",
+  "Hazme un quiz de 10 preguntas para mis alumnos",
+  "Dame una dinámica grupal para el salón de clases",
+];
+
 function EmptyState({
-  chips,
-  onChip,
   profile,
+  dark,
+  onSend,
 }: {
-  chips: string[];
-  onChip: (text: string) => void;
-  profile: TeacherProfile;
+  profile: TeacherProfile | null;
+  dark: boolean;
+  onSend: (text: string) => void;
 }) {
+  const suggestions = profile
+    ? getSuggestedChips(profile).slice(0, 3)
+    : GENERIC_SUGGESTIONS;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fade-in">
-      <div className="w-12 h-12 rounded-full bg-amber/15 flex items-center justify-center mb-4">
-        <span className="text-amber text-lg font-bold">N</span>
+      <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
+        dark ? "bg-white/10" : "bg-carbon/10"
+      }`}>
+        <img src={dark ? "/logo-white.png" : "/logo.png"} alt="" className="w-7 h-7" />
       </div>
-      <h2 className="text-xl font-semibold text-carbon mb-1">¿Qué necesitas hoy?</h2>
-      <p className="text-sm text-carbon/50 mb-8 max-w-sm">
-        Soy tu copiloto para {profile.subject} en {profile.level.toLowerCase()}. Pregúntame lo que necesites o prueba con alguno de estos:
+      <h2 className={`text-xl font-semibold mb-1 ${dark ? "text-white" : "text-carbon"}`}>
+        ¿Qué necesitas hoy?
+      </h2>
+      <p className={`text-sm mb-6 max-w-sm ${dark ? "text-white/50" : "text-carbon/50"}`}>
+        {profile
+          ? `Soy tu copiloto para ${profile.subject} en ${profile.level.toLowerCase()}. Pregúntame lo que necesites.`
+          : "Soy tu copiloto de IA para enseñar. Pregúntame lo que necesites."}
       </p>
-      <div className="flex flex-wrap gap-2 justify-center max-w-md">
-        {chips.map((chip) => (
+      <div className="w-full max-w-md space-y-1">
+        {suggestions.map((text, i) => (
           <button
-            key={chip}
-            onClick={() => onChip(chip)}
-            className="px-4 py-2 rounded-full text-sm border border-amber/30 text-carbon/70 hover:bg-amber/10 hover:border-amber/50 hover:text-carbon transition-all"
+            key={i}
+            onClick={() => onSend(text)}
+            className={`w-full text-left px-4 py-2.5 text-sm rounded-lg transition-colors ${
+              dark
+                ? "text-white/70 hover:text-white hover:bg-white/5"
+                : "text-carbon/70 hover:text-carbon hover:bg-carbon/5"
+            }`}
           >
-            {chip}
+            {text}
           </button>
         ))}
       </div>
@@ -227,7 +324,7 @@ function EmptyState({
   );
 }
 
-function FormattedMessage({ content }: { content: string }) {
+function FormattedMessage({ content, dark }: { content: string; dark: boolean }) {
   const sections = content.split(/(?=###\s)/);
 
   return (
@@ -245,27 +342,30 @@ function FormattedMessage({ content }: { content: string }) {
               key={i}
               className={`mb-4 ${
                 isParaSalon
-                  ? "bg-amber/5 border-l-2 border-amber/40 pl-3 py-2 rounded-r-lg"
+                  ? dark
+                    ? "bg-white/[0.05] border-l-2 border-white/20 pl-3 py-2 rounded-r-lg"
+                    : "bg-carbon/[0.03] border-l-2 border-carbon/20 pl-3 py-2 rounded-r-lg"
                   : isComoSeLogro
-                    ? "bg-carbon/[0.02] border-l-2 border-carbon/10 pl-3 py-2 rounded-r-lg"
+                    ? dark
+                      ? "bg-white/[0.03] border-l-2 border-white/10 pl-3 py-2 rounded-r-lg"
+                      : "bg-carbon/[0.02] border-l-2 border-carbon/10 pl-3 py-2 rounded-r-lg"
                     : ""
               }`}
             >
-              <h3 className="font-semibold text-sm text-carbon mb-1">
-                {isParaSalon && <span className="text-amber mr-1">*</span>}
+              <h3 className={`font-semibold text-sm mb-1 ${dark ? "text-white" : "text-carbon"}`}>
                 {title}
               </h3>
-              <SimpleMarkdown text={body} />
+              <SimpleMarkdown text={body} dark={dark} />
             </div>
           );
         }
-        return <SimpleMarkdown key={i} text={section} />;
+        return <SimpleMarkdown key={i} text={section} dark={dark} />;
       })}
     </div>
   );
 }
 
-function SimpleMarkdown({ text }: { text: string }) {
+function SimpleMarkdown({ text, dark }: { text: string; dark: boolean }) {
   const lines = text.split("\n");
   const elements: React.ReactNode[] = [];
   let listItems: string[] = [];
@@ -278,7 +378,7 @@ function SimpleMarkdown({ text }: { text: string }) {
         <Tag key={elements.length} className={`${listType === "ol" ? "list-decimal" : "list-disc"} ml-5 mb-3 space-y-1`}>
           {listItems.map((item, j) => (
             <li key={j} className="text-sm">
-              <InlineFormat text={item} />
+              <InlineFormat text={item} dark={dark} />
             </li>
           ))}
         </Tag>
@@ -306,7 +406,7 @@ function SimpleMarkdown({ text }: { text: string }) {
       if (trimmed) {
         elements.push(
           <p key={elements.length} className="mb-2 text-sm">
-            <InlineFormat text={trimmed} />
+            <InlineFormat text={trimmed} dark={dark} />
           </p>
         );
       }
@@ -317,14 +417,14 @@ function SimpleMarkdown({ text }: { text: string }) {
   return <>{elements}</>;
 }
 
-function InlineFormat({ text }: { text: string }) {
+function InlineFormat({ text, dark }: { text: string; dark: boolean }) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return (
     <>
       {parts.map((part, i) => {
         if (part.startsWith("**") && part.endsWith("**")) {
           return (
-            <strong key={i} className="font-semibold text-carbon">
+            <strong key={i} className={`font-semibold ${dark ? "text-white" : "text-carbon"}`}>
               {part.slice(2, -2)}
             </strong>
           );

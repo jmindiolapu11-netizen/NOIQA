@@ -3,17 +3,23 @@
 @theme inline {
   --color-lino: #F5F2EB;
   --color-carbon: #1E252B;
-  --color-amber: #D97724;
-  --color-copper: #E08953;
-  --color-wine: #5C1D24;
   --color-lino-dark: #E8E4DB;
-  --font-sans: var(--font-plus-jakarta);
+  --color-dark-bg: #0A0A0A;
+  --color-dark-card: #1a1a1a;
+  --font-sans: var(--font-inter);
 }
 
 body {
   background: var(--color-lino);
   color: var(--color-carbon);
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Dark mode */
+.dark body,
+body.dark {
+  background: var(--color-dark-bg);
+  color: #fff;
 }
 
 @keyframes fade-in {
@@ -38,22 +44,11 @@ body {
 .chat-message p:last-child { margin-bottom: 0; }
 .chat-message ul, .chat-message ol { margin: 0.5rem 0 0.75rem 1.25rem; }
 .chat-message li { margin-bottom: 0.25rem; }
-.chat-message strong { font-weight: 600; color: var(--color-carbon); }
+.chat-message strong { font-weight: 600; }
 .chat-message h3 { font-weight: 700; font-size: 0.95rem; margin: 1rem 0 0.4rem; }
 
-.typing-dot {
-  animation: typing 1.4s infinite ease-in-out;
-}
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typing {
-  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-  30% { opacity: 1; transform: translateY(-4px); }
-}
-
 /* Splash screen animations */
-.splash-logo-wrap { width: 130px; }
+.splash-logo-wrap { width: 160px; }
 .splash-logo-img {
   width: 100%; display: block;
   clip-path: polygon(0 115%, 15% 115%, 0% 100%, 0% 100%);
@@ -75,19 +70,35 @@ body {
   animation: splashFadeUp 0.5s ease-out 0.85s forwards;
 }
 
-.splash-cta {
-  margin-top: 36px; opacity: 0;
-  background: #5C1D24; color: #F5F2EB; border: none;
-  font-family: inherit; font-weight: 600; font-size: 14px;
-  padding: 13px 36px; border-radius: 12px;
-  cursor: pointer; transition: background 0.2s;
+/* NOIQA branded loader */
+.noiqa-loader-group {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: noiqa-spin 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
-.splash-cta:hover { background: #4a1720; }
-.splash-cta.play {
-  animation: splashFadeUp 0.5s ease-out 1.15s forwards;
+.noiqa-loader-core {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: noiqa-pulse 1.8s ease-in-out infinite alternate;
+}
+@keyframes noiqa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes noiqa-pulse {
+  0% { opacity: 0.5; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1.08); }
 }
 
 @keyframes splashFadeUp {
   0% { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.animate-sheet-up {
+  animation: sheet-up 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards;
 }
